@@ -20,9 +20,7 @@
 
 int main(int argc, char *argv[])
 {
-	int ret;
-	char data[1024] = {0};
-	float light = 0;
+	Exchange data;
 	 if (0 != mqtt_init())
     {
         puts("Fail to instantiate mqtt");
@@ -38,14 +36,14 @@ int main(int argc, char *argv[])
 	while(1)
 	{
 		sleep(3);
-		light = get_virtual_env();
-		if(light >= ILL_OVER_THROUGH)
+		data = get_virtual_env();
+		if(data.light >= ILL_OVER_THROUGH)
 		{
 			mqtt_publish(CTRL_PUB_TOPIC, LAMP_OFF);
 			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
 			printf("Phrase 1\n");
 		}
-		else if(light <= ILL_UNDER_THROUGH)
+		else if(data.light <= ILL_UNDER_THROUGH)
 		{
 			mqtt_publish(CTRL_PUB_TOPIC, LAMP_ON);
 			mqtt_publish(CTRL_PUB_TOPIC, ALARM_OFF);
@@ -54,7 +52,7 @@ int main(int argc, char *argv[])
 		else
 		{	
 		}
-		printf("Light condition:%f \n", light);
+		printf("Light condition:%f \n", data.light);
 	}
 
 	exit_mqtt();

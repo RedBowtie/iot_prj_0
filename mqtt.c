@@ -6,6 +6,7 @@
 #include "mqtt.h"
 #include "parse_config.h"
 #include "cJSON.h"
+
 #define ADDRESS "tcp://192.168.177.250:1883" 
 #define CLIENTID_PUB "ExampleClientPub"
 #define CLIENTID_SUB "ExampleClientSub"
@@ -13,10 +14,20 @@
 #define TIMEOUT 10000L
 //#define PUB_TOPIC "ScratchToSoftWare" 
 #define MQTT_SUB_TOPIC "1662600472837/SoftWareToScratch" 
+
 #define FAN_OFF "{'fan':false}"
 #define FAN_ON "{'fan':true}"
+
 #define ILL "light"
-#define TEM "tem"
+#define CO2 "co2"
+#define PML "pm25"
+#define FLG "flamGas"
+#define INF "infrared"
+#define SMK "smoke"
+#define FLA "flame"
+#define RF "RFID"
+#define VC "Voice"
+#define FC "FaceID"
 
 
 MQTTClient client;
@@ -25,8 +36,9 @@ volatile MQTTClient_deliveryToken deliveredtoken;
 
 char virtual_data[1024] = {0};
 char *pend;
-float ill = 0;
-float transfor_virtual_data()
+Exchange env_data;
+
+void transfer_virtual_data()
 {
 	// printf("Status:%s\n", virtual_data);
 	
@@ -39,15 +51,53 @@ float transfor_virtual_data()
 		printf("parse err\n");
 		return -1;
 	}
+
 	item = cJSON_GetObjectItem(root, ILL);
-	if(NULL != item)
-	{
-		ill = item->valuedouble;
+	if(item != NULL){
+		env_data.light = item->valuedouble;
 	}
+	item = cJSON_GetObjectItem(root, CO2);
+	if(item != NULL){
+		env_data.co2 = item->valuedouble;
+	}
+	item = cJSON_GetObjectItem(root, PML);
+	if(item != NULL){
+		env_data.pm25 = item->valuedouble;
+	}
+	item = cJSON_GetObjectItem(root, FLG);
+	if(item != NULL){
+		env_data.flamGas = item->valueint;
+	}
+	item = cJSON_GetObjectItem(root, INF);
+	if(item != NULL){
+		env_data.infrared = item->valueint;
+	}
+	item = cJSON_GetObjectItem(root, SMK);
+	if(item != NULL){
+		env_data.smoke = item->valueint;
+	}
+	item = cJSON_GetObjectItem(root, FLA);
+	if(item != NULL){
+		env_data.flame = item->valueint;
+	}
+	item = cJSON_GetObjectItem(root, RF);
+	if(item != NULL){
+		env_data.RFID = item->valuestring;
+	}
+	item = cJSON_GetObjectItem(root, VC);
+	if(item != NULL){
+		env_data.Voice = item->valuestring;
+	}
+	item = cJSON_GetObjectItem(root, FC);
+	if(item != NULL){
+		env_data.FaceID = item->valuestring;
+	}
+
 }
-float get_virtual_env()
+
+Exchange get_virtual_env()
 {
-	return ill;
+	return env_data;
 }
 void delivered(void *context, MQTTClient_deliveryToken dt)
 {
@@ -58,7 +108,7 @@ int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *m
 {
 	memset(virtual_data,0,sizeof(virtual_data)); // empty msg
 	memcpy(virtual_data,message->payload,message->payloadlen); // store the subscribe msg
-	transfor_virtual_data(); // interpret the msg, get it to main()
+	transfer_virtual_data(); // interpret the msg, get it to main()
 	MQTTClient_freeMessage(&message); // release resource
 	MQTTClient_free(topicName);
 	return 1;
