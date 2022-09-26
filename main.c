@@ -45,9 +45,7 @@ void emergency_exit(int infrd){
 }
 
 void report(int status, Exchange data){
-	if (status&1)
-		status^=1;
-	if (status){
+	if (status&&(!(status&1))){
 		puts("\n! WARNING: Certain value critical, see below:");
 		if (status & 2)
 			puts("FLAMMABLE GAS DETECTED!\n");
@@ -93,7 +91,7 @@ int main(int argc, char *argv[])
 		if(data.light > ILL_BOUND){
 			if(!(status&1)){
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_ON);
-				sleep(1);
+				sleep(2);
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_IDLE);
 				// printf("Too much light, lower sunshade.\n");
 				status |= 1;
@@ -102,7 +100,7 @@ int main(int argc, char *argv[])
 			if(status&1){
 				status ^= 1;
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_OFF);
-				sleep(1);
+				sleep(2);
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_IDLE);
 			}
 			// printf("Light condition normal, sunshade off.\n");

@@ -24,7 +24,7 @@
 #define PML "PM2.5"
 #define FLG "flamGas"
 #define INF "infrared"
-#define SMK "smoke"
+#define SMK "smog"
 #define FLA "flame"
 #define RF "RFID_125K"
 #define VC "speech"
