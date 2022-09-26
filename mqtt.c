@@ -25,7 +25,7 @@
 #define INF "infrared"
 #define SMK "smoke"
 #define FLA "flame"
-#define RF "RFID_24G"
+#define RF "RFID_125K"
 #define VC "speech"
 #define FC "faceId"
 

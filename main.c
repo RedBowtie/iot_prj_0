@@ -43,8 +43,13 @@ void emergency_exit(int infrd){
 	}
 }
 
-void repport(){
-	return 0;
+void repport(int status, Exchange data){
+	if (status){
+		puts("WARNING: Certain value critical, see below:");
+	}else{
+		puts("Report: All data within normal condition");
+		printf("Light: %f \t co2: %f \t pm2.5: %f \n", data.light, data.co2, data.pm25);
+	}
 }
 
 int main(int argc, char *argv[])
@@ -75,10 +80,42 @@ int main(int argc, char *argv[])
 			printf("Light condition normal, sunshade off.\n");
 		}
 
+		if (data.flamGas){
+			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
+			// printf("Flammable gas detected, turn on alarm.\n");
+			emergency_exit(data.infrared);
+			status |= 2;
+		}else{
+			if(status&2)
+				status ^= 2;
+		}
+
+		if (data.flame){
+			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
+			mqtt_publish(CTRL_PUB_TOPIC, IRRI_ON);
+			// printf("Flame detected, turn on alarm.\n");
+			emergency_exit(data.infrared);
+			status |= 4;
+		}else{
+			if(status&4)
+				status ^= 4;
+		}
+
+		if (data.smoke){
+			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
+			mqtt_publish(CTRL_PUB_TOPIC, IRRI_ON);
+			// printf("Smoke detected, turn on alarm.\n");
+			emergency_exit(data.infrared);
+			status |= 8;
+		}else{
+			if(status&8)
+				status ^= 8;
+		}
+
 		if(data.co2 > CO2_BOUND){
 			mqtt_publish(CTRL_PUB_TOPIC, FAN_ON);
 			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
-			printf("CO2 level high, turn on fans and alarms.\n");
+			// printf("CO2 level high, turn on fans and alarms.\n");
 			emergency_exit(data.infrared);
 			status |= 16;
 		}else{
@@ -89,7 +126,7 @@ int main(int argc, char *argv[])
 		if (data.pm25 > PML_BOUND){
 			mqtt_publish(CTRL_PUB_TOPIC, FAN_ON);
 			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
-			printf("PM2.5 high, turn on fans and alarms.\n");
+			// printf("PM2.5 high, turn on fans and alarms.\n");
 			emergency_exit(data.infrared);
 			status |= 32;
 		}else {
@@ -97,43 +134,11 @@ int main(int argc, char *argv[])
 				status ^= 32;
 		}
 
-		if (data.flamGas){
-			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
-			printf("Flammable gas detected, turn on alarm.\n");
-			emergency_exit(data.infrared);
-			status |= 2;
-		}else{
-			if(status&2)
-				status ^= 2;
-		}
-
-		if (data.smoke){
-			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
-			mqtt_publish(CTRL_PUB_TOPIC, IRRI_ON);
-			printf("Smoke detected, turn on alarm.\n");
-			emergency_exit(data.infrared);
-			status |= 8;
-		}else{
-			if(status&8)
-				status ^= 8;
-		}
-
-		if (data.flame){
-			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
-			mqtt_publish(CTRL_PUB_TOPIC, IRRI_ON);
-			printf("Flame detected, turn on alarm.\n");
-			emergency_exit(data.infrared);
-			status |= 4;
-		}else{
-			if(status&4)
-				status ^= 4;
-		}
-
 		if (!strcmp(data.RFID, KEY)){
 			mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
 			printf("Key matched, door unlocked.\n");
 		}else{
-			printf("Key not matched, alarm on.\n");
+			printf("Key not matched.\n");
 		}
 
 		if(!strcmp(data.FaceID, FACEGROUP)){
@@ -181,7 +186,7 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		printf("Light condition:%f \n", data.light);
+		report(status, data);
 	}
 
 	exit_mqtt();
