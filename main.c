@@ -46,6 +46,8 @@ void emergency_exit(int infrd){
 }
 
 void report(int status, Exchange data){
+	if (status&1)
+		status^=1;
 	if (status&&(!(status&1))){
 		puts("\n!!Attention!!\n! WARNING: Certain value critical, see below:\n");
 		if (status & 2)
