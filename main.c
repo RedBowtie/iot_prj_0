@@ -26,8 +26,8 @@
 #define DOOR_OFF  "{\"doorLock\":false}"
 #define IRRI_ON   "{\"irrigation\":true}"
 #define IRRI_OFF  "{\"irrigation\":false}"
-
-#define LIGHT   "{\"light\":%f}"
+#define VCMD1     "{\"speech\":\"Opening sunshade.\"}"
+#define VCMD2     "{\"speech\":\"Closing sunshade.\"}"
 
 
 
@@ -41,12 +41,13 @@ const char CMD3[] = "sunshade";
 void emergency_exit(int infrd){
 	if (infrd){
 		mqtt_publish(CTRL_PUB_TOPIC, DOOR_ON);
+		puts("Door is unlocked for escape!");
 	}
 }
 
 void report(int status, Exchange data){
 	if (status&&(!(status&1))){
-		puts("\n! WARNING: Certain value critical, see below:");
+		puts("\n!!Attention!!\n! WARNING: Certain value critical, see below:\n");
 		if (status & 2)
 			puts("FLAMMABLE GAS DETECTED!\n");
 		if (status & 4)
@@ -82,18 +83,17 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-	while(1)
-	{
+	while(1){
 		puts("\n");
 		sleep(3);
 		data = get_virtual_env();
-		
+		// 2^0 - light
 		if(data.light > ILL_BOUND){
 			if(!(status&1)){
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_ON);
 				sleep(2);
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_IDLE);
-				// printf("Too much light, lower sunshade.\n");
+				puts("Sunshade is lowered due to high light intensity");
 				status |= 1;
 			}
 		}else{
@@ -102,77 +102,102 @@ int main(int argc, char *argv[])
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_OFF);
 				sleep(2);
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_IDLE);
+				puts("Light condition normal, sunshade off.");
 			}
-			// printf("Light condition normal, sunshade off.\n");
 		}
-		
+		// 2^1 - flamGas
 		if (data.flamGas){
-			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
-			// printf("Flammable gas detected, turn on alarm.\n");
-			emergency_exit(data.infrared);
-			status |= 2;
+			if(!(status&2)){
+				mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
+				emergency_exit(data.infrared);
+				status |= 2;
+			}
 		}else{
-			if(status&2)
+			if(status&2){
 				status ^= 2;
+				mqtt_publish(CTRL_PUB_TOPIC, ALARM_OFF);
+			}
 		}
-
+		// 2^2 - flame
 		if (data.flame){
-			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
-			mqtt_publish(CTRL_PUB_TOPIC, IRRI_ON);
-			// printf("Flame detected, turn on alarm.\n");
-			emergency_exit(data.infrared);
-			status |= 4;
+			if(!(status&4)){
+				mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
+				mqtt_publish(CTRL_PUB_TOPIC, IRRI_ON);
+				emergency_exit(data.infrared);
+				status |= 4;
+			}
 		}else{
-			if(status&4)
+			if(status&4){
 				status ^= 4;
+				mqtt_publish(CTRL_PUB_TOPIC, ALARM_OFF);
+				mqtt_publish(CTRL_PUB_TOPIC, IRRI_OFF);
+			}
 		}
-
+		// 2^3 - smoke
 		if (data.smoke){
-			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
-			mqtt_publish(CTRL_PUB_TOPIC, IRRI_ON);
-			// printf("Smoke detected, turn on alarm.\n");
-			emergency_exit(data.infrared);
-			status |= 8;
+			if(!(status&8)){
+				mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
+				mqtt_publish(CTRL_PUB_TOPIC, IRRI_ON);
+				emergency_exit(data.infrared);
+				status |= 8;
+			}
 		}else{
-			if(status&8)
+			if(status&8){
 				status ^= 8;
+				mqtt_publish(CTRL_PUB_TOPIC, ALARM_OFF);
+				mqtt_publish(CTRL_PUB_TOPIC, IRRI_OFF);
+			}
 		}
-
+		// 2^4 - co2
 		if(data.co2 > CO2_BOUND){
-			mqtt_publish(CTRL_PUB_TOPIC, FAN_ON);
-			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
-			// printf("CO2 level high, turn on fans and alarms.\n");
-			emergency_exit(data.infrared);
-			status |= 16;
+			if(!(status&16)){
+				mqtt_publish(CTRL_PUB_TOPIC, FAN_ON);
+				mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
+				emergency_exit(data.infrared);
+				status |= 16;
+			}
 		}else{
-			if(status&16)
+			if(status&16){
 				status ^= 16;
+				mqtt_publish(CTRL_PUB_TOPIC, FAN_OFF);
+				mqtt_publish(CTRL_PUB_TOPIC, ALARM_OFF);
+			}
 		}
-
+		// 2^5 - pm2.5
 		if (data.pm25 > PML_BOUND){
-			mqtt_publish(CTRL_PUB_TOPIC, FAN_ON);
-			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
-			// printf("PM2.5 high, turn on fans and alarms.\n");
-			emergency_exit(data.infrared);
-			status |= 32;
+			if(!(status&32)){
+				mqtt_publish(CTRL_PUB_TOPIC, FAN_ON);
+				mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
+				emergency_exit(data.infrared);
+				status |= 32;
+			}
 		}else {
-			if(status&32)
+			if(status&32){
 				status ^= 32;
+				mqtt_publish(CTRL_PUB_TOPIC, FAN_OFF);
+				mqtt_publish(CTRL_PUB_TOPIC, ALARM_OFF);
+			}
 		}
 		
 		if (data.RFID){
 			if (!strcmp(data.RFID, KEY)){
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
-				printf("Key matched, door unlocked.\n");
+				puts("Key matched, door unlocked for 3 sec.");
+				sleep(3);
+				mqtt_publish(CTRL_PUB_TOPIC, DOOR_ON);
+				puts("Door is re-locked");
 			}else{
-				printf("Key not matched.\n");
+				puts("Key not matched.");
 			}
 		}
 		
 		if (data.FaceID){
 			if(!strcmp(data.FaceID, FACEGROUP)){
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
-				printf("Face matched, door unlocked.\n");
+				puts("Key matched, door unlocked for 3 sec.");
+				sleep(3);
+				mqtt_publish(CTRL_PUB_TOPIC, DOOR_ON);
+				puts("Door is re-locked");
 			}		
 		}
 
@@ -210,8 +235,14 @@ int main(int argc, char *argv[])
 					}
 					if(flag==1){
 						mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_ON);
+						sleep(2);
+						mqtt_publish(CTRL_PUB_TOPIC, VCMD1);
+						puts("Voice command reveiced. Sunshade is now opened.");
 					}else if(flag==2){
-						mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_OFF);
+						mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_ON);
+						sleep(2);
+						mqtt_publish(CTRL_PUB_TOPIC, VCMD2);
+						puts("Voice command reveiced. Sunshade is now closed.");
 					}
 				}
 			}
