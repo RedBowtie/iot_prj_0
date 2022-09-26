@@ -2,7 +2,7 @@ CC = gcc
 # args, -c to generate *.o files
 # -g to generate debug info
 # -m32 to generate 32-bit code
-AFLAGS = -c -g -m32
+AFLAGS = -c -g
 # -lpthread to link pthread library
 # -lpaho-mqtt3c -lrt -lm to link paho-mqtt3c library
 LDFLAGS = -lpthread -m32 -lpaho-mqtt3c -lrt -lm
