@@ -21,7 +21,7 @@
 
 #define ILL "light"
 #define CO2 "co2"
-#define PML "pm25"
+#define PML "PM2.5"
 #define FLG "flamGas"
 #define INF "infrared"
 #define SMK "smoke"
