@@ -69,16 +69,19 @@ int main(int argc, char *argv[])
 
 	while(1)
 	{
-		puts("");
+		puts("\n");
 		sleep(3);
 		data = get_virtual_env();
 		
 		if(data.light > ILL_BOUND){
 			mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_ON);
-			printf("Too much light, lower sunshade.\n");
+			// printf("Too much light, lower sunshade.\n");
+			status |= 1;
 		}else{
+			if(status&1)
+				status ^= 1;
 			mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_OFF);
-			printf("Light condition normal, sunshade off.\n");
+			// printf("Light condition normal, sunshade off.\n");
 		}
 		
 		if (data.flamGas){

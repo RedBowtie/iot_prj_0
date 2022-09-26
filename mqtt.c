@@ -8,6 +8,7 @@
 #include "cJSON.h"
 
 #define ADDRESS "tcp://192.168.114.107:1883" 
+
 #define CLIENTID_PUB "ExampleClientPub"
 #define CLIENTID_SUB "ExampleClientSub"
 #define QOS 1
