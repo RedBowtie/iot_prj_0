@@ -38,7 +38,7 @@ char virtual_data[1024] = {0};
 char *pend;
 Exchange env_data;
 
-void transfer_virtual_data()
+int transfer_virtual_data()
 {
 	// printf("Status:%s\n", virtual_data);
 	

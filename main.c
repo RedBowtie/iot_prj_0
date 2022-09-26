@@ -43,7 +43,7 @@ void emergency_exit(int infrd){
 	}
 }
 
-void repport(int status, Exchange data){
+void report(int status, Exchange data){
 	if (status){
 		puts("WARNING: Certain value critical, see below:");
 	}else{
