@@ -30,7 +30,7 @@
 
 
 
-const char KEY[] = "090890080";
+const char KEY[] = "0908900800";
 const char FACEGROUP[] = "owner";
 const char CMD1[] = "open";
 const char CMD2[] = "close";
@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
 
 	while(1)
 	{
+		puts("");
 		sleep(3);
 		data = get_virtual_env();
 		
@@ -79,7 +80,7 @@ int main(int argc, char *argv[])
 			mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_OFF);
 			printf("Light condition normal, sunshade off.\n");
 		}
-
+		
 		if (data.flamGas){
 			mqtt_publish(CTRL_PUB_TOPIC, ALARM_ON);
 			// printf("Flammable gas detected, turn on alarm.\n");
@@ -133,59 +134,63 @@ int main(int argc, char *argv[])
 			if(status&32)
 				status ^= 32;
 		}
-
-		if (!strcmp(data.RFID, KEY)){
-			mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
-			printf("Key matched, door unlocked.\n");
-		}else{
-			printf("Key not matched.\n");
+		
+		if (data.RFID){
+			if (!strcmp(data.RFID, KEY)){
+				mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
+				printf("Key matched, door unlocked.\n");
+			}else{
+				printf("Key not matched.\n");
+			}
+		}
+		
+		if (data.FaceID){
+			if(!strcmp(data.FaceID, FACEGROUP)){
+				mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
+				printf("Face matched, door unlocked.\n");
+			}		
 		}
 
-		if(!strcmp(data.FaceID, FACEGROUP)){
-			mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
-			printf("Face matched, door unlocked.\n");
-		}		
-
-		int l = strlen(data.Voice);
-		int flag = 0;
-
-		if(l){
-			// target priority;
-			for(int i = 0; i<l-7; i++){
-				flag = 1;
-				for(int j = 0; j<8; j++)
-					if(data.Voice[i+j] != CMD3[j]){
-						flag = 0;
-						break;
-					}
-			}
-			if(flag){
-				for(int i = 0; i<l-3; i++){
+		if (data.Voice){
+			int l = strlen(data.Voice);
+			int flag = 0;
+			if(l){
+				// target priority;
+				for(int i = 0; i<l-7; i++){
 					flag = 1;
-					for(int j = 0; j<4; j++)
-						if(data.Voice[i+j] != CMD1[j]){
+					for(int j = 0; j<8; j++)
+						if(data.Voice[i+j] != CMD3[j]){
 							flag = 0;
 							break;
 						}
-					}
-				if(!flag){
-					for(int i = 0; i<l-4; i++){
-						flag = 2;
-						for(int j = 0; j<5; j++)
-							if(data.Voice[i+j] != CMD2[j]){
+				}
+				if(flag){
+					for(int i = 0; i<l-3; i++){
+						flag = 1;
+						for(int j = 0; j<4; j++)
+							if(data.Voice[i+j] != CMD1[j]){
 								flag = 0;
 								break;
 							}
+						}
+					if(!flag){
+						for(int i = 0; i<l-4; i++){
+							flag = 2;
+							for(int j = 0; j<5; j++)
+								if(data.Voice[i+j] != CMD2[j]){
+									flag = 0;
+									break;
+								}
+						}
 					}
-				}
-				if(flag==1){
-					mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_ON);
-				}else if(flag==2){
-					mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_OFF);
+					if(flag==1){
+						mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_ON);
+					}else if(flag==2){
+						mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_OFF);
+					}
 				}
 			}
 		}
-
 		report(status, data);
 	}
 
