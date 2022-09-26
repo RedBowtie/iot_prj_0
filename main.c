@@ -45,21 +45,23 @@ void emergency_exit(int infrd){
 }
 
 void report(int status, Exchange data){
+	if (status&1)
+		status^=1;
 	if (status){
-		puts("! WARNING: Certain value critical, see below:");
+		puts("\n! WARNING: Certain value critical, see below:");
 		if (status & 2)
-			puts("FLAMMABLE GAS DETECTED!");
+			puts("FLAMMABLE GAS DETECTED!\n");
 		if (status & 4)
-			puts("FLAME DETECTED!");
+			puts("FLAME DETECTED!\n");
 		if (status & 8)
-			puts("SMOKE DETECTED!");
+			puts("SMOKE DETECTED!\n");
 		if (status & 16){
 			puts("CO2 LEVEL Critical!");
-			printf("CO2: %f\n", data.co2);	
+			printf("CO2: %f\n\n", data.co2);	
 		}
 		if (status & 32){
 			puts("PM2.5 LEVEL Critical!");
-			printf("PM2.5: %f\n", data.pm25);	
+			printf("PM2.5: %f\n\n", data.pm25);	
 		}
 	}else{
 		puts("Report: All data within normal condition");
@@ -91,6 +93,7 @@ int main(int argc, char *argv[])
 		if(data.light > ILL_BOUND){
 			if(!(status&1)){
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_ON);
+				sleep(1);
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_IDLE);
 				// printf("Too much light, lower sunshade.\n");
 				status |= 1;
@@ -99,6 +102,7 @@ int main(int argc, char *argv[])
 			if(status&1){
 				status ^= 1;
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_OFF);
+				sleep(1);
 				mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_IDLE);
 			}
 			// printf("Light condition normal, sunshade off.\n");
