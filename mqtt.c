@@ -35,7 +35,7 @@ MQTTClient client;
 int fan_state = 0;
 volatile MQTTClient_deliveryToken deliveredtoken;
 
-char virtual_data[1024] = {0};
+char virtual_data[2048] = {0};
 char *pend;
 Exchange env_data;
 
