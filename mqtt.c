@@ -7,13 +7,13 @@
 #include "parse_config.h"
 #include "cJSON.h"
 
-#define ADDRESS "tcp://192.168.177.250:1883" 
+#define ADDRESS "tcp://192.168.114.107:1883" 
 #define CLIENTID_PUB "ExampleClientPub"
 #define CLIENTID_SUB "ExampleClientSub"
 #define QOS 1
 #define TIMEOUT 10000L
 //#define PUB_TOPIC "ScratchToSoftWare" 
-#define MQTT_SUB_TOPIC "1662600472837/SoftWareToScratch" 
+#define MQTT_SUB_TOPIC "1663401252952/AIOTSIM2APP" 
 
 #define FAN_OFF "{'fan':false}"
 #define FAN_ON "{'fan':true}"

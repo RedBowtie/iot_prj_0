@@ -9,8 +9,8 @@
 #define PML_BOUND 50
 
 
-#define CTRL_PUB_TOPIC "1662600472837/ScratchToSoftWare"
-#define SUB_TOPIC "1662600472837/SoftWareToScratch"
+#define CTRL_PUB_TOPIC "1663401252952/APP2AIOTSIM"
+#define SUB_TOPIC "1663401252952/AIOTSIM2APP"
 
 
 #define LAMP_ON    "{\"lamp\":true}"
