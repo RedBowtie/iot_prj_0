@@ -25,9 +25,9 @@
 #define INF "infrared"
 #define SMK "smoke"
 #define FLA "flame"
-#define RF "RFID"
-#define VC "Voice"
-#define FC "FaceID"
+#define RF "RFID_24G"
+#define VC "speech"
+#define FC "faceId"
 
 
 MQTTClient client;
