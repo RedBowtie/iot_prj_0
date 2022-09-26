@@ -195,7 +195,11 @@ int main(int argc, char *argv[])
 			if(!strcmp(data.FaceID, FACEGROUP)){
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
 				puts("Key matched, door unlocked for 3 sec.");
-				sleep(3);
+				for(int t = 3; t; t--){
+					printf("%d sec left\r", t);
+					fflush(stdout);
+					sleep(1);
+				}
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_ON);
 				puts("Door is re-locked");
 			}		
@@ -235,14 +239,15 @@ int main(int argc, char *argv[])
 					}
 					if(flag==1){
 						mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_ON);
+						puts("Voice command reveiced. Sunshade is now opened.");
 						sleep(2);
 						mqtt_publish(CTRL_PUB_TOPIC, VCMD1);
-						puts("Voice command reveiced. Sunshade is now opened.");
 					}else if(flag==2){
 						mqtt_publish(CTRL_PUB_TOPIC, SUNSHADE_ON);
+						puts("Voice command reveiced. Sunshade is now closed.");
 						sleep(2);
 						mqtt_publish(CTRL_PUB_TOPIC, VCMD2);
-						puts("Voice command reveiced. Sunshade is now closed.");
+						
 					}
 				}
 			}
