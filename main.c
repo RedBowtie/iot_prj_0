@@ -183,7 +183,10 @@ int main(int argc, char *argv[])
 			if (!strcmp(data.RFID, KEY)){
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
 				puts("Key matched, door unlocked for 3 sec.");
-				sleep(3);
+				for(int t = 3; t; t--){
+					printf("%d sec left\r", t);
+					sleep(1);
+				}
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_ON);
 				puts("Door is re-locked");
 			}else{
@@ -197,7 +200,6 @@ int main(int argc, char *argv[])
 				puts("Key matched, door unlocked for 3 sec.");
 				for(int t = 3; t; t--){
 					printf("%d sec left\r", t);
-					fflush(stdout);
 					sleep(1);
 				}
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_ON);
