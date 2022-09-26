@@ -73,7 +73,7 @@ void report(int status, Exchange data){
 int main(int argc, char *argv[])
 {
 	Exchange data;
-	int status  = 0;
+	int status  = 1;
 
 	 if (0 != mqtt_init()){
         puts("Fail to instantiate mqtt");
