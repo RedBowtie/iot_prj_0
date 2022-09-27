@@ -105,6 +105,9 @@ int transfer_virtual_data()
 Exchange get_virtual_env()
 {
 	return env_data;
+	env_data.RFID = NULL;
+	env_data.Voice = NULL;
+	env_data.FaceID = NULL;
 }
 void delivered(void *context, MQTTClient_deliveryToken dt)
 {
