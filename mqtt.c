@@ -82,19 +82,19 @@ int transfer_virtual_data()
 		env_data.flame = item->valueint;
 	}
 	item = cJSON_GetObjectItem(root, RF);
-	if(item != NULL)&&(!env_data.RFID){
+	if((item != NULL)&&(!env_data.RFID)){
 		env_data.RFID = item->valuestring;
 	}else{
 		env_data.RFID = NULL;
 	}
 	item = cJSON_GetObjectItem(root, VC);
-	if(item != NULL)&&(!env_data.Voice){
+	if((item != NULL)&&(!env_data.Voice)){
 		env_data.Voice = item->valuestring;
 	}else{
 		env_data.Voice = NULL;
 	}
 	item = cJSON_GetObjectItem(root, FC);
-	if(item != NULL&&!env_data.FaceID){
+	if((item != NULL)&&(!env_data.FaceID)){
 		env_data.FaceID = item->valuestring;
 	}else{
 		env_data.FaceID = NULL;
