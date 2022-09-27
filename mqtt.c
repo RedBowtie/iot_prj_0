@@ -37,7 +37,7 @@ volatile MQTTClient_deliveryToken deliveredtoken;
 
 char virtual_data[1024] = {0};
 char *pend;
-Exchange env_data;
+volatile Exchange env_data;
 
 int transfer_virtual_data()
 {
