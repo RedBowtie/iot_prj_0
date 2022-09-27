@@ -104,10 +104,8 @@ int transfer_virtual_data()
 
 Exchange get_virtual_env()
 {
-	if(env_data.RFID)
-		continue;
-	if(env_data.FaceID)
-		continue;
+	if(env_data.RFID);
+	if(env_data.FaceID);
 	return env_data;
 	env_data.RFID = NULL;
 	env_data.Voice = NULL;
