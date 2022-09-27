@@ -35,7 +35,7 @@ MQTTClient client;
 int fan_state = 0;
 volatile MQTTClient_deliveryToken deliveredtoken;
 
-char virtual_data[2048] = {0};
+char virtual_data[1024] = {0};
 char *pend;
 Exchange env_data;
 
@@ -82,19 +82,19 @@ int transfer_virtual_data()
 		env_data.flame = item->valueint;
 	}
 	item = cJSON_GetObjectItem(root, RF);
-	if(item != NULL){
+	if(item != NULL)&&(!env_data.RFID){
 		env_data.RFID = item->valuestring;
 	}else{
 		env_data.RFID = NULL;
 	}
 	item = cJSON_GetObjectItem(root, VC);
-	if(item != NULL){
+	if(item != NULL)&&(!env_data.Voice){
 		env_data.Voice = item->valuestring;
 	}else{
 		env_data.Voice = NULL;
 	}
 	item = cJSON_GetObjectItem(root, FC);
-	if(item != NULL){
+	if(item != NULL&&!env_data.FaceID){
 		env_data.FaceID = item->valuestring;
 	}else{
 		env_data.FaceID = NULL;
