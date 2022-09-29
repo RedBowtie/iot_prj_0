@@ -9,8 +9,8 @@ typedef struct Storage{
     int infrared;
     int smoke;
     int flame;
-    int *RFID;
-    int *FaceID;
+    int RFID;
+    int FaceID;
     char *Voice;
 }Exchange;
 

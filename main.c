@@ -36,14 +36,14 @@ const char CMD2[] = "close";
 const char CMD3[] = "sunshade";
 
 
-void emergency_exit(int infrd){
+inline void emergency_exit(int infrd){
 	if (infrd){
 		mqtt_publish(CTRL_PUB_TOPIC, DOOR_ON);
 		puts("Door is unlocked for escape!");
 	}
 }
 
-void report(int status, Exchange data){
+inline void report(int status, Exchange data){
 	if (status&1)
 		status^=1;
 	if (status&&(!(status&1))){
