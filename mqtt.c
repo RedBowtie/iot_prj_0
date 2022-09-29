@@ -56,6 +56,26 @@ int transfer_virtual_data()
 		return -1;
 	}
 
+	item = cJSON_GetObjectItem(root, RF);
+	if((item != NULL)){
+		if (!strcmp(item->valuestring, KEY))
+			env_data.RFID = 1;
+		else 
+			env_data.RFID = -1;
+		return 0;
+	}else
+		env_data.RFID = 0;
+
+	item = cJSON_GetObjectItem(root, FC);
+	if((item != NULL)){
+		if (!strcmp(item->valuestring, FACEGROUP))
+			env_data.FaceID = 1;
+		else
+			env_data.FaceID = -1;
+		return 0;
+	}else
+		env_data.FaceID = 0;
+
 	item = cJSON_GetObjectItem(root, ILL);
 	if(item != NULL){
 		env_data.light = item->valuedouble;
@@ -97,23 +117,6 @@ int transfer_virtual_data()
 		env_data.flame = item->valueint;
 	}
 
-	item = cJSON_GetObjectItem(root, RF);
-	if((item != NULL)){
-		if (!strcmp(item->valuestring, KEY))
-			env_data.RFID = 1;
-		else 
-			env_data.RFID = -1;
-		return 0;
-	}
-
-	item = cJSON_GetObjectItem(root, FC);
-	if((item != NULL)){
-		if (!strcmp(item->valuestring, FACEGROUP))
-			env_data.FaceID = 1;
-		else
-			env_data.FaceID = -1;
-		return 0;
-	}
 	/*
 	item = cJSON_GetObjectItem(root, VC);
 	if((item != NULL)&&(!env_data.Voice)){
@@ -127,9 +130,6 @@ int transfer_virtual_data()
 Exchange get_virtual_env()
 {
 	return env_data;
-	env_data.RFID = 0;
-	env_data.FaceID = 0;
-	// env_data.Voice = NULL;
 }
 void delivered(void *context, MQTTClient_deliveryToken dt)
 {
