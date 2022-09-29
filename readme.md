@@ -1,6 +1,4 @@
-## Introductions
-
----
+# Introductions
 
 This is a project of IoT. And unfortunately, I'm afraid the call of mqtt functions within the template I got is not in the standard way. So I guess the repo wil have no meaning other than a record of some hours I spent on this course.
 
