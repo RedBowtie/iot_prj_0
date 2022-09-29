@@ -11,7 +11,7 @@ typedef struct Storage{
     int flame;
     int RFID;
     int FaceID;
-    char *Voice;
+    // char *Voice;
 }Exchange;
 
 int mqtt_init();
