@@ -133,7 +133,7 @@ Exchange get_virtual_env()
 }
 void delivered(void *context, MQTTClient_deliveryToken dt)
 {
-	printf("Message with token value %d delivery confirmed\n", dt);
+	// printf("Message with token value %d delivery confirmed\n", dt);
 	deliveredtoken = dt;
 }
 int msgarrvd(void *context, char *topicName, int topicLen, MQTTClient_message *message)
