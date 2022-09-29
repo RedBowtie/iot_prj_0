@@ -30,6 +30,9 @@
 #define VC "speech"
 #define FC "faceId"
 
+const char KEY[] = "0908900800";
+const char FACEGROUP[] = "owner";
+
 
 MQTTClient client;
 int fan_state = 0;
@@ -56,58 +59,77 @@ int transfer_virtual_data()
 	item = cJSON_GetObjectItem(root, ILL);
 	if(item != NULL){
 		env_data.light = item->valuedouble;
+		return 0;
 	}
+
 	item = cJSON_GetObjectItem(root, CO2);
 	if(item != NULL){
 		env_data.co2 = item->valuedouble;
+		return 0;
 	}
+
 	item = cJSON_GetObjectItem(root, PML);
 	if(item != NULL){
 		env_data.pm25 = item->valuedouble;
+		return 0;
 	}
+
 	item = cJSON_GetObjectItem(root, FLG);
 	if(item != NULL){
 		env_data.flamGas = item->valueint;
+		return 0;
 	}
+
 	item = cJSON_GetObjectItem(root, INF);
 	if(item != NULL){
 		env_data.infrared = item->valueint;
+		return 0;
 	}
+
 	item = cJSON_GetObjectItem(root, SMK);
 	if(item != NULL){
 		env_data.smoke = item->valueint;
+		return 0;
 	}
+
 	item = cJSON_GetObjectItem(root, FLA);
 	if(item != NULL){
 		env_data.flame = item->valueint;
 	}
+
 	item = cJSON_GetObjectItem(root, RF);
-	if((item != NULL)&&(!env_data.RFID)){
-		env_data.RFID = item->valuestring;
-	}else{
-		env_data.RFID = NULL;
+	if((item != NULL)){
+		if (!strcmp(item->valuestring, KEY))
+			env_data.RFID = 1;
+		else 
+			env_data.RFID = -1;
+		return 0;
 	}
+
+	item = cJSON_GetObjectItem(root, FC);
+	if((item != NULL)){
+		if (!strcmp(item->valuestring, FACEGROUP))
+			env_data.FaceID = 1;
+		else
+			env_data.FaceID = -1;
+		return 0;
+	}
+	/*
 	item = cJSON_GetObjectItem(root, VC);
 	if((item != NULL)&&(!env_data.Voice)){
 		env_data.Voice = item->valuestring;
+		return 0;
 	}else{
 		env_data.Voice = NULL;
-	}
-	item = cJSON_GetObjectItem(root, FC);
-	if((item != NULL)&&(!env_data.FaceID)){
-		env_data.FaceID = item->valuestring;
-	}else{
-		env_data.FaceID = NULL;
-	}
-
+	}*/
 }
 
 Exchange get_virtual_env()
 {
 	return env_data;
-	env_data.RFID = NULL;
-	env_data.Voice = NULL;
-	env_data.FaceID = NULL;
+	env_data.RFID = 0;
+	env_data.FaceID = 0;
+	// env_data.Voice = NULL;
 }
 void delivered(void *context, MQTTClient_deliveryToken dt)
 {

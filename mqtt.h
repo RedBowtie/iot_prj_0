@@ -9,9 +9,9 @@ typedef struct Storage{
     int infrared;
     int smoke;
     int flame;
-    char *RFID;
+    int *RFID;
+    int *FaceID;
     char *Voice;
-    char *FaceID;
 }Exchange;
 
 int mqtt_init();

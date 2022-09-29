@@ -31,8 +31,6 @@
 
 
 
-const char KEY[] = "0908900800";
-const char FACEGROUP[] = "owner";
 const char CMD1[] = "open";
 const char CMD2[] = "close";
 const char CMD3[] = "sunshade";
@@ -65,7 +63,7 @@ void report(int status, Exchange data){
 			printf("PM2.5: %f\n\n", data.pm25);	
 		}
 	}else{
-		puts("Report: All data within normal condition");
+		puts("\n--Status: Normal--\nReport: All data within normal condition");
 		printf("Light: %f \t co2: %f \t pm2.5: %f \n", data.light, data.co2, data.pm25);
 	}
 }
@@ -180,29 +178,32 @@ int main(int argc, char *argv[])
 				mqtt_publish(CTRL_PUB_TOPIC, ALARM_OFF);
 			}
 		}
-		
+		// Comparison moved to mqtt.c
 		if (data.RFID){
-			if (!strcmp(data.RFID, KEY)){
+			if (data.RFID > 0){
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
 				puts("Key matched, door unlocked for 3 sec.");
 				sleep(3);
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_ON);
 				puts("Door is re-locked");
 			}else{
-				puts("Key not matched.");
+				puts("Key NOT matched!");
 			}
 		}
-		
+		// Comparison moved to mqtt.c
 		if (data.FaceID){
-			if(!strcmp(data.FaceID, FACEGROUP)){
+			if(data.FaceID > 0){
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_OFF);
-				puts("Key matched, door unlocked for 3 sec.");
+				puts("Face matched, door unlocked for 3 sec.");
 				sleep(3);
 				mqtt_publish(CTRL_PUB_TOPIC, DOOR_ON);
 				puts("Door is re-locked");
+			}
+			else{
+				puts("Face NOT matched!");
 			}		
 		}
-
+		/*
 		if (data.Voice){
 			int l = strlen(data.Voice);
 			int flag = 0;
@@ -249,7 +250,7 @@ int main(int argc, char *argv[])
 					}
 				}
 			}
-		}
+		}*/
 		report(status, data);
 	}
 
