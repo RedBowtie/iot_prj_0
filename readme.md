@@ -28,4 +28,4 @@ See [here](https://redbowtie.github.io/2022/10/30/IoTCoursework/).
 
 Wish everyone that you don't have to deal with the bad instructors and modify their *original* template, or use any *valuable software* they developed.
 
-And they won't even listen to you, because you're not paying for the software.
+And they won't even listen to you, because you're not paying for the software. You can it this because they're "generous".
