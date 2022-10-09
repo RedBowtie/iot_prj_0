@@ -22,7 +22,7 @@ $ ./smart_home
 
 ## How this works
 
-I'm not sure if I should say this. Maybe one day.
+See [here](https://redbowtie.github.io/2022/10/30/IoTCoursework/).
 
 ## END
 
